@@ -22,6 +22,9 @@ public class ServerTank
     private const float TurretTurnSpeed = 120f;
     private const float GunPitchSpeed = 20f;
 
+    public bool PrevFire;
+    public float FireCooldown;
+
     public void Update(float deltaTime)
     {
         UpdateBody(deltaTime);
@@ -51,8 +54,12 @@ public class ServerTank
     private void UpdateGun(float deltaTime) // 포신 상하 회전
     {
         gunPitch += LastInput.Gun * GunPitchSpeed * deltaTime;
-        gunPitch = Math.Clamp(gunPitch, -10f, 20f);
+        gunPitch = Math.Clamp(gunPitch, -5f, 30f);
+    }
 
-
+    public void TakeDamage(int damage)
+    {
+        Hp -= damage;
+        if (Hp < 0) Hp = 0;
     }
 }
