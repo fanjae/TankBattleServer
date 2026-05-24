@@ -20,7 +20,7 @@ public class ServerTank
     private const float ReverseSpeed = 3f;
     private const float TurnSpeed = 120f;
     private const float TurretTurnSpeed = 120f;
-    private const float GunPitchSpeed = 30f;
+    private const float GunPitchSpeed = 20f;
 
     public void Update(float deltaTime)
     {
@@ -51,7 +51,7 @@ public class ServerTank
     private void UpdateGun(float deltaTime) // 포신 상하 회전
     {
         gunPitch += LastInput.Gun * GunPitchSpeed * deltaTime;
-        gunPitch = Math.Clamp(gunPitch, -10f, 30f);
+        gunPitch = Math.Clamp(gunPitch, -10f, 20f);
 
 
     }
