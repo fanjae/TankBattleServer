@@ -69,10 +69,26 @@ public class GameServer
             // 현재 상태 설정
             StatePacket statePacket = match.CreateStatePacket();
 
+            List<PlayerSession> disconnectedPlayers = new();
+
             // 상태 동기화를 위해 모든 플레이어게 상태 패킷 전송
             foreach (PlayerSession player in players)
             {
-                await player.SendJsonAsync(statePacket);
+                try
+                {
+                    await player.SendJsonAsync(statePacket);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Failed to send to Player {player.PlayerId}. Reason: {e.Message}");
+                    disconnectedPlayers.Add(player); 
+                }
+            }
+
+            foreach (PlayerSession player in disconnectedPlayers) // 연결 끊긴 플레이어 제거 처리
+            {
+                player.Close(); 
+                players.Remove(player);
             }
 
             // 대기

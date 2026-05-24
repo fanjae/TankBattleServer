@@ -9,6 +9,8 @@ public class PlayerSession
 {
     public int PlayerId { get; }
 
+    private const int MaxPacketSize = 4096;
+
     private readonly TcpClient client;
     private readonly NetworkStream stream;
 
@@ -69,6 +71,11 @@ public class PlayerSession
         byte[] lengthBuffer = await ReadExactAsync(4);
         int bodyLength = BitConverter.ToInt32(lengthBuffer, 0);
 
+        if (bodyLength <= 0 || bodyLength > MaxPacketSize)
+        {
+            throw new Exception($"Invalid packet size: {bodyLength}");
+        }
+
         // 본문 정보 읽어서 JSON 문자열로 변환
         byte[] bodyBuffer = await ReadExactAsync(bodyLength);
         return Encoding.UTF8.GetString(bodyBuffer);
@@ -95,5 +102,10 @@ public class PlayerSession
         }
 
         return buffer;
+    }
+    public void Close()
+    {
+        stream.Close();
+        client.Close();
     }
 }
