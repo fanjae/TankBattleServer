@@ -19,9 +19,8 @@ public class Match
     // 탱크 초기 위치 설정
     public Match()
     {
-        tanks[1] = new ServerTank { PlayerId = 1, x = -20f, z = -20f, angle = 90f };
-
-        tanks[2] = new ServerTank { PlayerId = 2, x = 30f, z = -30f, angle = -90f };
+        tanks[1] = new ServerTank(playerId : 1, x : -20f, z : -20f, angle : 90f);
+        tanks[2] = new ServerTank(playerId : 2, x : 30f, z : -30f, angle : -90f);
     }
 
     // 연결된 세션의 playerId 기준으로 판단.
@@ -29,7 +28,7 @@ public class Match
     {
         if (tanks.TryGetValue(playerId, out ServerTank? tank) == false) return;
 
-        tank.LastInput = input;
+        tank.SetInput(input);
     }
 
     // Tick 단위로 탱크 상태 갱신
@@ -72,10 +71,10 @@ public class Match
     private void CreateCannonBall(ServerTank tank)
     {
         // 탱크 몸체 회전 + 포탑 회전을 합친 실제 발사 방향
-        float yaw = tank.angle + tank.turretTurn;
+        float yaw = tank.Angle + tank.TurretTurn;
 
         float yawRad = yaw * MathF.PI / 180f;
-        float pitchRad = tank.gunPitch * MathF.PI / 180f;
+        float pitchRad = tank.GunPitch * MathF.PI / 180f;
 
         // X축, Z축에 대한 이동 방향 보정.
         float horizontal = MathF.Cos(pitchRad);
@@ -140,12 +139,12 @@ public class Match
             {
                 PlayerId = tank.PlayerId,
 
-                X = tank.x,
-                Z = tank.z,
-                Angle = tank.angle,
+                X = tank.X,
+                Z = tank.Z,
+                Angle = tank.Angle,
 
-                TurretTurn = tank.turretTurn,
-                GunPitch = tank.gunPitch,
+                TurretTurn = tank.TurretTurn,
+                GunPitch = tank.GunPitch,
 
                 Hp = tank.Hp
             };
@@ -185,8 +184,8 @@ public class Match
                 if (tank.PlayerId == cannonBall.OwnerPlayerId)
                     continue;
 
-                float dx = tank.x - cannonBall.X;
-                float dz = tank.z - cannonBall.Z;
+                float dx = tank.X - cannonBall.X;
+                float dz = tank.Z - cannonBall.Z;
 
                 // 계산 단순화를 위해서 XZ 평면 거리로 피격 판정
                 float distanceSq = dx * dx + dz * dz;
