@@ -1,12 +1,10 @@
-﻿using System.IO;
-using TankBattleServer.Packets;
+﻿using TankBattleServer.Packets;
 
 namespace TankBattleServer;
 
 public class Match
 {
     private readonly Dictionary<int, ServerTank> tanks = new();
-
     private readonly List<ServerCannonBall> cannonBalls = new();
 
     private int nextCannonBallId = 1;
@@ -93,9 +91,9 @@ public class Match
         float sin = MathF.Sin(yawRad);
 
         //  탱크 월드 기준 포신 끝 좌표
-        float muzzleWorldX = tank.x + muzzleLocalX * cos + muzzleLocalZ * sin;
+        float muzzleWorldX = tank.X + muzzleLocalX * cos + muzzleLocalZ * sin;
         float muzzleWorldY = muzzleLocalY;
-        float muzzleWorldZ = tank.z - muzzleLocalX * sin + muzzleLocalZ * cos;
+        float muzzleWorldZ = tank.Z - muzzleLocalX * sin + muzzleLocalZ * cos;
 
         const float fireSpeed = 32f;
 

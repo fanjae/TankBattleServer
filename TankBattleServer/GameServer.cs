@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using System.Net.Sockets;
 using TankBattleServer.Packets;
 
@@ -9,6 +10,8 @@ public class GameServer
     private readonly int port;
     private readonly List<PlayerSession> players = new();
     private readonly Match match = new();
+
+    private readonly ConcurrentQueue<PlayerInputCommand> inputQueue = new();
 
     public GameServer(int port)
     {
@@ -45,8 +48,12 @@ public class GameServer
             // 전달
             await session.SendJsonAsync(welcomePacket);
 
-            // 별도 Task 형태로 입력 수신 루프 시작
-            _ = session.ReceiveLoopAsync(match.SetInput);
+            // 입력 수신 Task. 입력이 올때마다 큐에 넣어서 처리
+            // 콜백 형태로 PlayerInputCommand 처리
+            _ = session.ReceiveLoopAsync((playerId, input) =>
+            {
+                inputQueue.Enqueue(new PlayerInputCommand(playerId, input));
+            });
         }
 
         Console.WriteLine("Match started.");
@@ -63,6 +70,12 @@ public class GameServer
 
         while (true)
         {
+            // 큐에 쌓여있는 입력 전부 이번 Tick에 반영
+            while (inputQueue.TryDequeue(out PlayerInputCommand command))
+            {
+                match.SetInput(command.PlayerId, command.Input);
+            }
+
             // 게임 상태 업데이트
             match.Update(deltaTime);
 
