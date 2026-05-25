@@ -18,9 +18,9 @@ public class Match
     // 탱크 초기 위치 설정
     public Match()
     {
-        tanks[1] = new ServerTank { PlayerId = 1, x = -3f, z = 0f, angle = 90f };
+        tanks[1] = new ServerTank { PlayerId = 1, x = -20f, z = -20f, angle = 90f };
 
-        tanks[2] = new ServerTank { PlayerId = 2, x = 3f, z = 0f, angle = -90f };
+        tanks[2] = new ServerTank { PlayerId = 2, x = 30f, z = -30f, angle = -90f };
     }
 
     // 연결된 세션의 playerId 기준으로 판단.
@@ -180,11 +180,14 @@ public class Match
         {
             foreach (ServerTank tank in tanks.Values)
             {
+                // 본인이 쏜 경우 맞지 않게 처리
                 if (tank.PlayerId == cannonBall.OwnerPlayerId)
                     continue;
 
                 float dx = tank.x - cannonBall.X;
                 float dz = tank.z - cannonBall.Z;
+
+                // 계산 단순화를 위해서 XZ 평면 거리로 피격 판정
                 float distanceSq = dx * dx + dz * dz;
 
                 if (distanceSq <= HitRadius * HitRadius)
