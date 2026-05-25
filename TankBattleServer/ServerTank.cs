@@ -49,6 +49,9 @@ public class ServerTank
 
     private void UpdateBody(float deltaTime) // 탱크 몸체 이동 및 회전 
     {
+        float move = Math.Clamp(LastInput.Move, -1f, 1f);
+        float turn = Math.Clamp(LastInput.Turn, -1f, 1f);
+
         float speed = LastInput.Move >= 0f ? TankSpeed : ReverseSpeed; // 전진 속도와 후진 속도 처리
 
         Angle += LastInput.Turn * TurnSpeed * deltaTime;
@@ -63,11 +66,15 @@ public class ServerTank
 
     private void UpdateTurret(float deltaTime) // 터렛 좌우 회전
     {
+        float turret = Math.Clamp(LastInput.Turret, -1f, 1f);
+
         TurretTurn += LastInput.Turret * TurretTurnSpeed * deltaTime;
     }
 
     private void UpdateGun(float deltaTime) // 포신 상하 회전
     {
+        float gun = Math.Clamp(LastInput.Gun, -1f, 1f);
+
         GunPitch += LastInput.Gun * GunPitchSpeed * deltaTime;
         GunPitch = Math.Clamp(GunPitch, -5f, 30f);
     }
