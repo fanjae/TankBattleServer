@@ -191,7 +191,7 @@ public class Match
                 if (distanceSq <= HitRadius * HitRadius)
                 {
                     tank.TakeDamage(CannonBallDamage);
-                    cannonBall.LifeTime = 100f; // 죽은 포탄으로 만들기 위해 충분히 긴 시간으로 처리
+                    cannonBall.MarkDead(); // 포탄의 삭제를 위한 마킹 처리 
                     break;
                 }
             }

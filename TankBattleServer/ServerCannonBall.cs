@@ -19,7 +19,8 @@ public class ServerCannonBall
     private const float MaxLifeTime = 3f; // 포탄 최대 생존시간
 
     // 일정 시간이 지났거나 지면에 닿으면 제거 대상으로 간주
-    public bool IsDead => LifeTime >= MaxLifeTime || Y <= 0f;
+    public bool IsExpired { get; private set; }
+    public bool IsDead => IsExpired || LifeTime >= MaxLifeTime || Y <= 0f;
 
     public void Update(float deltaTime)
     {
@@ -31,5 +32,9 @@ public class ServerCannonBall
         Z += VelZ * deltaTime;
 
         LifeTime += deltaTime;
+    }
+    public void MarkDead()
+    {
+        IsExpired = true;
     }
 }
