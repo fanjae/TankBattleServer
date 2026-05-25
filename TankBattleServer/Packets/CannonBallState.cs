@@ -1,4 +1,5 @@
-﻿public class CannonBallState
+﻿namespace TankBattleServer.Packets;
+public class CannonBallState
 {
     public int CannonBallId { get; set; }
     public int OwnerPlayerId { get; set; }

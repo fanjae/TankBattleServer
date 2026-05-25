@@ -1,4 +1,5 @@
-﻿public class StatePacket
+﻿namespace TankBattleServer.Packets;
+public class StatePacket
 {
     public string Type { get; set; } = "State";
 

@@ -1,4 +1,5 @@
-﻿public class InputPacket // 플레이어 입력 패킷
+﻿namespace TankBattleServer.Packets;
+public class InputPacket // 플레이어 입력 패킷
 {
     public string Type { get; set; } = "Input";
 

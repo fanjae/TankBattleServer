@@ -1,4 +1,6 @@
-﻿namespace TankBattleServer;
+﻿using TankBattleServer.Packets;
+
+namespace TankBattleServer;
 
 public class ServerTank
 {

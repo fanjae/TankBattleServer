@@ -1,4 +1,5 @@
-﻿public class TankState // 패킷 DTO
+﻿namespace TankBattleServer.Packets;
+public class TankState // 패킷 DTO
 {
     public int PlayerId { get; set; }
 
