@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using TankBattleServer.Packets;
 
 namespace TankBattleServer;
@@ -13,6 +14,8 @@ public class PlayerSession
 
     private readonly TcpClient client;
     private readonly NetworkStream stream;
+
+    private readonly SemaphoreSlim sendLock = new(1, 1);
 
     public PlayerSession(int playerId, TcpClient client)
     {
@@ -33,13 +36,23 @@ public class PlayerSession
         // 본문 길이를 4바이트 정수로 변환
         byte[] lengthPrefix = BitConverter.GetBytes(body.Length);
 
-        // 길이 4바이트 전송
-        await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
+        await sendLock.WaitAsync();
 
-        // JSON 본문 전송
-        await stream.WriteAsync(body, 0, body.Length);
+        try
+        {
 
-        Console.WriteLine($"Send to Player {PlayerId}: {json}");
+            // 길이 4바이트 전송
+            await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
+
+            // JSON 본문 전송
+            await stream.WriteAsync(body, 0, body.Length);
+        }
+        finally
+        {
+            sendLock.Release();
+        }
+
+        // Console.WriteLine($"Send to Player {PlayerId}: {json}");
     }
     public async Task ReceiveLoopAsync(Action<int, InputPacket> onInputReceived)
     {
@@ -50,12 +63,30 @@ public class PlayerSession
                 // 패킷 수신
                 string json = await ReceiveJsonAsync();
 
-                // InputPacket 객체로 변환
-                InputPacket? packet = JsonSerializer.Deserialize<InputPacket>(json);
-                if (packet == null) continue;
+                JsonNode? node = JsonNode.Parse(json);
+                string? type = node?["Type"]?.GetValue<string>();
 
-                // 입력 수신에 대한 정보 전달
-                onInputReceived(PlayerId, packet);
+                if (type == "Input")
+                {
+                    // InputPacket 객체로 변환
+                    InputPacket? packet = JsonSerializer.Deserialize<InputPacket>(json);
+                    if (packet == null) continue;
+
+                    // 입력 수신에 대한 정보 전달
+                    onInputReceived(PlayerId, packet);
+                }
+                else if (type == "Ping")
+                {
+                    PingPacket? ping = JsonSerializer.Deserialize<PingPacket>(json);
+                    if (ping == null) continue;
+
+                    PongPacket pong = new PongPacket
+                    {
+                        ClientTimeMs = ping.ClientTimeMs
+                    };
+
+                    await SendJsonAsync(pong);
+                }
             }
         }
         catch (Exception e)
